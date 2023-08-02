@@ -1,6 +1,8 @@
 #include <stdio.h>
-#include<windows.h>
+#include <windows.h>
 #include <signal.h>
+#include <sys/types.h>
+
 
 void intHandler(int dummy) {
     printf("Yeah!");
@@ -12,12 +14,18 @@ void hupHandler(int dummy) {
     signal(SIGHUP, hupHandler);
 }
 
+void quitHandler(int dummy)
+{
+    printf("HMMMM");
+}
+
 
 int main()
 {
 
     signal(SIGINT, intHandler);
     signal(SIGHUP, hupHandler);
+    signal(SIGQUIT, quitHandler);
 
     int n;
 
