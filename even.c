@@ -3,9 +3,10 @@
 #include <signal.h>
 #include <sys/types.h>
 
+#define SIGHUP 1
 
 void intHandler(int dummy) {
-    printf("Yeah!");
+    printf("Yeah! %d", dummy);
     signal(SIGINT, intHandler);
 }
 
@@ -14,18 +15,12 @@ void hupHandler(int dummy) {
     signal(SIGHUP, hupHandler);
 }
 
-void quitHandler(int dummy)
-{
-    printf("HMMMM");
-}
-
 
 int main()
 {
 
     signal(SIGINT, intHandler);
     signal(SIGHUP, hupHandler);
-    signal(SIGQUIT, quitHandler);
 
     int n;
 
