@@ -16,6 +16,13 @@ Compiler/System : gcc/linux
 #define NV 20 /* max number of command tokens */
 #define NL 100 /* input buffer size */
 char line[NL]; /* command input buffer */
+
+void childHandler(int signal)
+{
+    waitpid((pid_t)-1, NULL, WNOHANG);
+    printf("Child process finished");
+}
+
 /*
 shell prompt
 */
