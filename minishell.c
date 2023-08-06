@@ -13,6 +13,7 @@ Compiler/System : gcc/linux
 #include <unistd.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <stdbool.h>
 #define NV 20 /* max number of command tokens */
 #define NL 100 /* input buffer size */
 char line[NL]; /* command input buffer */
@@ -21,6 +22,9 @@ void childHandler(int signal)
 {
     waitpid((pid_t)-1, NULL, WNOHANG);
     printf("Child process finished");
+
+    //Reset SIGCHLD handling
+    signal(SIGCHLD, SIG_DFL);
 }
 
 /*
@@ -42,9 +46,10 @@ main(int argk, char *argv[], char *envp[])
     char *v[NV]; /* array of pointers to command line tokens */
     char *sep = " \t\n";/* command line token separators */
     int i; /* parse index */
+    bool background; /* check if process is to run in background*/
     /* prompt for and process one command line at a time */
     while (1) { /* do Forever */
-
+        background = false;
         prompt();
         fgets(line, NL, stdin);
         fflush(stdin);
@@ -59,7 +64,15 @@ main(int argk, char *argv[], char *envp[])
 
         for (i = 1; i < NV; i++) {
             v[i] = strtok(NULL, sep);
-            if (v[i] == NULL) break;
+            if (v[i] == NULL) 
+            {
+                if (strcmp(v[i-1], "&") == 0)
+                {
+                    background = true;
+                    signal(SIGCHLD, childHandler);
+                }
+                break;
+            }
         }
         /* assert i is number of tokens + 1 */
         /* fork a child process to exec the command in v[0] */
@@ -74,9 +87,12 @@ main(int argk, char *argv[], char *envp[])
             }
                 default: /* code executed only by parent process */
             {
-                wpid = wait(0);
-                printf("%s done \n", v[0]);
-                break;
+                if (!background)
+                {
+                    wpid = wait(0);
+                    printf("%s done \n", v[0]);
+                    break;
+                }
             }
         } /* switch */
     } /* while */
