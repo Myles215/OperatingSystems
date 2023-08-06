@@ -36,17 +36,22 @@ prompt(void)
     fflush(stdout);
 }
 
+//Handles sigchld calls
 void childHandler(int dummy)
 {
-    int pid = waitpid(-1, &status, WNOHANG);
-    printf("got pid: %d", pid);
+    //We check the pid of the calling process
+    int pid = waitpid((pid_t)-1, NULL, WNOHANG);
 
+    //Check if this is one of our background processes
     for (int i = qStart;i<qEnd;i++)
     {
         i = i%10;
+        //If we find our background process handle it
         if (bgPids[i] == pid)
         {
-            printf("Background: %s done", bgCmds[i]);
+            //Print the background command
+            fprintf(stdout, "Background: %s done", bgCmds[i]);
+            //MRemove the old command and pid from our queue
             bgPids[i] = bgPids[qStart];
             strcpy(bgCmds[i], bgCmds[qStart]);
             qStart = (qStart + 1)%10;
@@ -54,6 +59,7 @@ void childHandler(int dummy)
             return;
         }
     }
+    //If its not a background command we don't handle
     
 }
 
@@ -125,10 +131,11 @@ main(int argk, char *argv[], char *envp[])
                 }
                 else
                 {
+                    //Prepping background process stuff
                     bgPids[qEnd] = frkRtnVal;
                     strcpy(bgCmds[qEnd], v[0]);
                     qEnd = (qEnd+1)%10;
-                    printf("Setting up pid: %d", frkRtnVal);
+                    bgpid = frkRtnVal;
                     signal(SIGCHLD, childHandler);
                     background = false;
                 }
