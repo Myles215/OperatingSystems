@@ -18,14 +18,14 @@ Compiler/System : gcc/linux
 #define NL 100 /* input buffer size */
 char line[NL]; /* command input buffer */
 
-void childHandler(int signal)
-{
-    waitpid((pid_t)-1, NULL, WNOHANG);
-    printf("Child process finished");
+int status;
+bool background; /* check if process is to run in background*/
+int bgpid = 0;
 
-    //Reset SIGCHLD handling
-    signal(SIGCHLD, SIG_DFL);
-}
+int bgPids[10];
+char* bgCmds[10];
+int qStart = 0;
+int qEnd = 0;
 
 /*
 shell prompt
@@ -34,6 +34,27 @@ prompt(void)
 {
     fprintf(stdout, "\n msh> ");
     fflush(stdout);
+}
+
+void childHandler(int dummy)
+{
+    int pid = waitpid(-1, &status, WNOHANG);
+    printf("got pid: %d", pid);
+
+    for (int i = qStart;i<qEnd;i++)
+    {
+        i = i%10;
+        if (bgPids[i] == pid)
+        {
+            printf("Background: %s done", bgCmds[i]);
+            bgPids[i] = bgPids[qStart];
+            strcpy(bgCmds[i], bgCmds[qStart]);
+            qStart = (qStart + 1)%10;
+            signal(SIGCHLD, SIG_DFL);
+            return;
+        }
+    }
+    
 }
 
 main(int argk, char *argv[], char *envp[])
@@ -46,7 +67,10 @@ main(int argk, char *argv[], char *envp[])
     char *v[NV]; /* array of pointers to command line tokens */
     char *sep = " \t\n";/* command line token separators */
     int i; /* parse index */
-    bool background; /* check if process is to run in background*/
+    for (int i = 0;i<10;i++)
+    {
+        bgCmds[i] = (char*)malloc(sizeof(char)*10);
+    }
     /* prompt for and process one command line at a time */
     while (1) { /* do Forever */
         background = false;
@@ -69,11 +93,12 @@ main(int argk, char *argv[], char *envp[])
                 if (strcmp(v[i-1], "&") == 0)
                 {
                     background = true;
-                    signal(SIGCHLD, childHandler);
+                    v[i-1] = NULL;
                 }
                 break;
             }
         }
+
         /* assert i is number of tokens + 1 */
         /* fork a child process to exec the command in v[0] */
         switch (frkRtnVal = fork()) {
@@ -83,15 +108,29 @@ main(int argk, char *argv[], char *envp[])
             }
                 case 0: /* code executed only by child process */
             {
-                execvp(v[0], v);
+
+                if (strcmp(v[0], "cd") == 0)
+                {
+                    chdir(v[1]);
+                } else execvp(v[0], v);\
             }
                 default: /* code executed only by parent process */
             {
+
                 if (!background)
                 {
                     wpid = wait(0);
                     printf("%s done \n", v[0]);
                     break;
+                }
+                else
+                {
+                    bgPids[qEnd] = frkRtnVal;
+                    strcpy(bgCmds[qEnd], v[0]);
+                    qEnd = (qEnd+1)%10;
+                    printf("Setting up pid: %d", frkRtnVal);
+                    signal(SIGCHLD, childHandler);
+                    background = false;
                 }
             }
         } /* switch */
