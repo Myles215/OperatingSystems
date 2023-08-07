@@ -22,9 +22,9 @@ int status;
 bool background; /* check if process is to run in background*/
 
 int bgCount = 0;
-int bgPids[10];
-int bgId[10];
-char* bgCmds[10];
+int bgPids[32];
+int bgId[32];
+char* bgCmds[32];
 int qStart = 0;
 int qEnd = 0;
 
@@ -47,7 +47,7 @@ void childHandler(int dummy)
     //Check if this is one of our background processes
     for (int i = qStart;i!=qEnd;i++)
     {
-        i = i%10;
+        i = i%32;
         //If we find our background process handle it
         if (bgPids[i] == pid)
         {
@@ -58,7 +58,7 @@ void childHandler(int dummy)
             bgPids[i] = bgPids[qStart];
             strcpy(bgCmds[i], bgCmds[qStart]);
             bgId[i] = bgId[qStart];
-            qStart = (qStart + 1)%10;
+            qStart = (qStart + 1)%32;
             if (qStart == qEnd) bgCount = 0;
             signal(SIGCHLD, childHandler);
             return;
@@ -77,7 +77,7 @@ int main(int argk, char *argv[], char *envp[])
     char *v[NV]; /* array of pointers to command line tokens */
     char *sep = " \t\n";/* command line token separators */
     int i; /* parse index */
-    for (int i = 0;i<10;i++)
+    for (int i = 0;i<32;i++)
     {
         bgCmds[i] = (char*)malloc(sizeof(char)*10);
     }
@@ -164,7 +164,7 @@ int main(int argk, char *argv[], char *envp[])
                     strcpy(bgCmds[qEnd], command);
                     bgCount += 1;
                     bgId[qEnd] = bgCount;
-                    qEnd = (qEnd+1)%10;
+                    qEnd = (qEnd+1)%32;
 
                     printf("[%d] %d\n", bgId[qEnd-1], bgPids[qEnd-1]);
                     fflush(stdout);
