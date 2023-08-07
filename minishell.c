@@ -154,7 +154,7 @@ int main(int argk, char *argv[], char *envp[])
                     } 
                     else if (chdir(v[1]) != 0)
                     {
-                        perror("Error when changing directory");
+                        //perror("Error when changing directory");
                     };
                 }
                 else
