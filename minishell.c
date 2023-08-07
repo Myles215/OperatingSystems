@@ -128,11 +128,7 @@ int main(int argk, char *argv[], char *envp[])
 
                 if (strcmp(v[0], "cd") != 0)
                 {
-                    if (execvp(v[0], v) == -1)
-                    {
-                        //perror("Exec in child failed");
-                        exit(0);
-                    }; 
+                    execvp(v[0], v);
                 } 
                 else 
                 {
