@@ -150,7 +150,7 @@ int main(int argk, char *argv[], char *envp[])
                     } 
                     else
                     {
-                        int error = chdir(v[1]);
+                        chdir(v[1]);
                         //perror("Error when changing directory");
                     };
                     break;
