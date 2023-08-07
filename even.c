@@ -8,12 +8,10 @@
 
 void intHandler(int dummy) {
     printf("Yeah!");
-    //signal(SIGINT, intHandler);
 }
 
 void hupHandler(int dummy) {
     printf("Ouch!");
-    //signal(SIGHUP, hupHandler);
 }
 
 
