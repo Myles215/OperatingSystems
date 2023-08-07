@@ -7,12 +7,12 @@
 #define SIGHUP 1
 
 void intHandler(int dummy) {
-    printf("Yeah!");
+    printf("Yeah!\n");
     //signal(SIGINT, intHandler);
 }
 
 void hupHandler(int dummy) {
-    printf("Ouch!");
+    printf("Ouch!\n");
     //signal(SIGHUP, hupHandler);
 }
 
@@ -20,18 +20,18 @@ void hupHandler(int dummy) {
 int main()
 {
 
-    struct sigaction intSa;
-    intSa.sa_handler = intHandler;
-    sigemptyset(&intSa.sa_mask);
-    intSa.sa_flags = SA_RESTART; /* Restart functions if
-                                 interrupted by handler */
-    if (sigaction(SIGINT, &intSa, NULL) == -1)
-    {
-        printf("Error handlign signal");
-    }
+    // struct sigaction intSa;
+    // intSa.sa_handler = intHandler;
+    // sigemptyset(&intSa.sa_mask);
+    // intSa.sa_flags = SA_RESTART; /* Restart functions if
+    //                              interrupted by handler */
+    // if (sigaction(SIGINT, &intSa, NULL) == -1)
+    // {
+    //     printf("Error handlign signal");
+    // }
 
-    // signal(SIGINT, intHandler);
-    // signal(SIGHUP, hupHandler);
+    signal(SIGINT, intHandler);
+    signal(SIGHUP, hupHandler);
 
     int n;
 
@@ -47,14 +47,14 @@ int main()
 
         // endwait = time(NULL) + seconds;
         // while (time (NULL) < endwait) {}
-        time_t start_time = time(NULL);
-        int seconds_slept = 0;
-        int seconds = 5;
-        while (seconds_slept < seconds)
-        {
-            sleep(seconds - seconds_slept);
-            seconds_slept = (time(NULL) - start_time);
-        }
+        // time_t start_time = time(NULL);
+        // int seconds_slept = 0;
+        // int seconds = 5;
+        // while (seconds_slept < seconds)
+        // {
+        //     sleep(seconds - seconds_slept);
+        //     seconds_slept = (time(NULL) - start_time);
+        // }
     }
 
     return 0;
