@@ -52,7 +52,7 @@ void childHandler(int dummy)
         if (bgPids[i] == pid)
         {
             //Print the background command
-            printf("[%d]+ Done %s\n", bgId[i], bgCmds[i]);
+            fprintf(stdout, "[%d]+ Done %s\n", bgId[i], bgCmds[i]);
             fflush(stdout);
             //Remove the old command and pid from our queue
             bgPids[i] = bgPids[qStart];
