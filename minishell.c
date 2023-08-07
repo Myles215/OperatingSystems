@@ -20,9 +20,10 @@ char line[NL]; /* command input buffer */
 
 int status;
 bool background; /* check if process is to run in background*/
-int bgpid = 0;
 
+int bgCount = 0;
 int bgPids[10];
+int bgId[10];
 char* bgCmds[10];
 int qStart = 0;
 int qEnd = 0;
@@ -30,10 +31,11 @@ int qEnd = 0;
 /*
 shell prompt
 */
-prompt(void)
+int prompt(void)
 {
-    fprintf(stdout, "\n msh> ");
+    //fprintf(stdout, "\n msh> ");
     fflush(stdout);
+    return 0;
 }
 
 //Handles sigchld calls
@@ -43,27 +45,29 @@ void childHandler(int dummy)
     int pid = waitpid((pid_t)-1, NULL, WNOHANG);
 
     //Check if this is one of our background processes
-    for (int i = qStart;i<qEnd;i++)
+    for (int i = qStart;i!=qEnd;i++)
     {
         i = i%10;
         //If we find our background process handle it
         if (bgPids[i] == pid)
         {
             //Print the background command
-            fprintf(stdout, "Background: %s done", bgCmds[i]);
-            //MRemove the old command and pid from our queue
+            fprintf(stdout, "[%d]+ Done                        %s\n", bgId[i], bgCmds[i]);
+            fflush(stdout);
+            //Remove the old command and pid from our queue
             bgPids[i] = bgPids[qStart];
             strcpy(bgCmds[i], bgCmds[qStart]);
+            bgId[i] = bgId[qStart];
             qStart = (qStart + 1)%10;
-            signal(SIGCHLD, SIG_DFL);
+            if (qStart == qEnd) bgCount = 0;
+            signal(SIGCHLD, childHandler);
             return;
         }
     }
     //If its not a background command we don't handle
-    
 }
 
-main(int argk, char *argv[], char *envp[])
+int main(int argk, char *argv[], char *envp[])
     /* argk - number of arguments */
     /* argv - argument vector from command line */
     /* envp - environment pointer */
@@ -85,12 +89,15 @@ main(int argk, char *argv[], char *envp[])
         fflush(stdin);
 
         if (feof(stdin)) { /* non-zero on EOF */
-            fprintf(stderr, "EOF pid %d feof %d ferror %d\n", getpid(), feof(stdin), ferror(stdin));
+            //fprintf(stderr, "EOF pid %d feof %d ferror %d\n", getpid(), feof(stdin), ferror(stdin));
             exit(0);
         }
         if (line[0] == '#' || line[0] == '\n' || line[0] == '\000') continue; /* to prompt */
 
         v[0] = strtok(line, sep);
+
+        char command[32];
+        strcpy(command, v[0]);
 
         for (i = 1; i < NV; i++) {
             v[i] = strtok(NULL, sep);
@@ -103,6 +110,11 @@ main(int argk, char *argv[], char *envp[])
                 }
                 break;
             }
+            else if (strcmp(v[i], "&") != 0) 
+            {
+                strcat(command, " ");
+                strcat(command, v[i]);
+            }
         }
 
         /* assert i is number of tokens + 1 */
@@ -110,6 +122,8 @@ main(int argk, char *argv[], char *envp[])
         switch (frkRtnVal = fork()) {
             case -1: /* fork returns error to parent process */
             {
+                //perror("Process started incorrectly");
+                exit(0);
                 break;
             }
                 case 0: /* code executed only by child process */
@@ -126,20 +140,25 @@ main(int argk, char *argv[], char *envp[])
                 if (!background)
                 {
                     wpid = wait(0);
-                    printf("%s done \n", v[0]);
+                    //printf("%s done \n", v[0]);
                     break;
                 }
                 else
                 {
                     //Prepping background process stuff
                     bgPids[qEnd] = frkRtnVal;
-                    strcpy(bgCmds[qEnd], v[0]);
+                    strcpy(bgCmds[qEnd], command);
+                    bgCount += 1;
+                    bgId[qEnd] = bgCount;
                     qEnd = (qEnd+1)%10;
-                    bgpid = frkRtnVal;
+
+                    printf("[%d] %d\n", bgId[qEnd-1], bgPids[qEnd-1]);
                     signal(SIGCHLD, childHandler);
                     background = false;
                 }
             }
         } /* switch */
     } /* while */
+
+    return 0;
 } /* main */
