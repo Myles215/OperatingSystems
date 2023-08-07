@@ -24,7 +24,7 @@ bool background; /* check if process is to run in background*/
 int bgCount = 0;
 int bgPids[32];
 int bgId[32];
-char* bgCmds[32];
+char bgCmds[32][32];
 int qStart = 0;
 int qEnd = 0;
 
@@ -77,10 +77,7 @@ int main(int argk, char *argv[], char *envp[])
     char *v[NV]; /* array of pointers to command line tokens */
     char *sep = " \t\n";/* command line token separators */
     int i; /* parse index */
-    for (int i = 0;i<32;i++)
-    {
-        bgCmds[i] = (char*)malloc(sizeof(char)*10);
-    }
+
     /* prompt for and process one command line at a time */
     while (1) { /* do Forever */
         background = false;
