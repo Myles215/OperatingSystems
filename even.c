@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <windows.h>
+#include <unistd.h>
 #include <signal.h>
 #include <sys/types.h>
 
@@ -30,7 +30,7 @@ int main()
     for (int i = 0;i<=n*2;i+=2)
     {
         printf("%d\n", i);
-        Sleep(500);
+        sleep(5);
     }
 
     return 0;
