@@ -8,10 +8,12 @@
 
 void intHandler(int dummy) {
     printf("Yeah!");
+    fflush(stdout);
 }
 
 void hupHandler(int dummy) {
     printf("Ouch!");
+    fflush(stdout);
 }
 
 
@@ -28,7 +30,14 @@ int main()
     {
         printf("%d", i);
         fflush(stdout);
-        sleep(5);
+        time_t start_time = time(NULL);
+        int seconds_slept = 0;
+        int seconds = 5;
+        while (seconds_slept < seconds)
+        {
+            sleep(seconds - seconds_slept);
+            seconds_slept = (time(NULL) - start_time);
+        }
     }
 
     return 0;
