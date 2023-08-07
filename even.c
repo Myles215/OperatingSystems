@@ -3,6 +3,8 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <time.h>
+#include <string.h>
+#include <stdlib.h>
 
 #define SIGHUP 1
 
@@ -17,14 +19,12 @@ void hupHandler(int dummy) {
 }
 
 
-int main()
+int main(int argc, char *argv[])
 {
     signal(SIGINT, intHandler);
     signal(SIGHUP, hupHandler);
 
-    int n;
-
-    scanf("%d", &n);
+    long n = strtol(argv[1], NULL, 10);
 
     for (int i = 0;i<n*2;i+=2)
     {
