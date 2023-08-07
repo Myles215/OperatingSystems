@@ -7,12 +7,12 @@
 #define SIGHUP 1
 
 void intHandler(int dummy) {
-    printf("Yeah!\n");
+    printf("Yeah!");
     //signal(SIGINT, intHandler);
 }
 
 void hupHandler(int dummy) {
-    printf("Ouch!\n");
+    printf("Ouch!");
     //signal(SIGHUP, hupHandler);
 }
 
