@@ -21,23 +21,18 @@ void hupHandler(int dummy) {
 
 int main(int argc, char *argv[])
 {
+    //Set signal handlers to custom handlers
     signal(SIGINT, intHandler);
     signal(SIGHUP, hupHandler);
 
+    //Read in user input
     long n = strtol(argv[1], NULL, 10);
 
+    //Iterate from 0 to n*2
     for (int i = 0;i<n*2;i+=2)
     {
         printf("%d\n", i);
         fflush(stdout);
-        // time_t start_time = time(NULL);
-        // int seconds_slept = 0;
-        // int seconds = 5;
-        // while (seconds_slept < seconds)
-        // {
-        //     sleep(seconds - seconds_slept);
-        //     seconds_slept = (time(NULL) - start_time);
-        // }
         sleep(5);
     }
 
