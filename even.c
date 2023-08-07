@@ -6,7 +6,7 @@
 #define SIGHUP 1
 
 void intHandler(int dummy) {
-    printf("Yeah! %d", dummy);
+    printf("Yeah!", dummy);
     signal(SIGINT, intHandler);
 }
 
