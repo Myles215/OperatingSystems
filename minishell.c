@@ -64,7 +64,7 @@ void childHandler(int dummy)
             return;
         }
     }
-    //If it's not a background command we don't handle
+    //If its not a background command we don't handle
 }
 
 int main(int argk, char *argv[], char *envp[])
@@ -132,13 +132,13 @@ int main(int argk, char *argv[], char *envp[])
                     {
                         //perror("Exec in child failed");
                         exit(0);
-                    }
+                    }; 
                 } 
                 else 
                 {
                     exit(0);
                 }
-                break;
+
             }
                 default: /* code executed only by parent process */
             {
@@ -153,7 +153,8 @@ int main(int argk, char *argv[], char *envp[])
                     {
                         chdir(v[1]);
                         //perror("Error when changing directory");
-                    }
+                    };
+
                     break;
                 }
                 else
