@@ -129,18 +129,21 @@ int main(int argk, char *argv[], char *envp[])
                 case 0: /* code executed only by child process */
             {
 
-                if (strcmp(v[0], "cd") == 0)
+                if (strcmp(v[0], "cd") != 0)
                 {
-                    chdir(v[1]);
-                } else execvp(v[0], v);\
+                    execvp(v[0], v);
+                } else exit(0);
             }
                 default: /* code executed only by parent process */
             {
                 if (!background)
                 {
-                    wait(0);
-                    //printf("%s done \n", v[0]);
-                    break;
+                    if (strcmp(v[0], "cd") != 0)
+                    {
+                        wait(0);
+                        //printf("%s done \n", v[0]);
+                        break;
+                    } else chdir(v[1]);
                 }
                 else
                 {
@@ -159,6 +162,5 @@ int main(int argk, char *argv[], char *envp[])
             }
         } /* switch */
     } /* while */
-
     return 0;
 } /* main */
