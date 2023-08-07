@@ -155,17 +155,26 @@ int main(int argk, char *argv[], char *envp[])
                 }
                 else
                 {
-                    //Prepping background process stuff
-                    bgPids[qEnd] = frkRtnVal;
-                    strcpy(bgCmds[qEnd], command);
-                    bgCount += 1;
-                    bgId[qEnd] = bgCount;
-                    qEnd = (qEnd+1)%32;
+                    if (strcmp(v[0], "cd") != 0)
+                    {
+                        //Prepping background process stuff
+                        bgPids[qEnd] = frkRtnVal;
+                        strcpy(bgCmds[qEnd], command);
+                        bgCount += 1;
+                        bgId[qEnd] = bgCount;
+                        qEnd = (qEnd+1)%32;
 
-                    printf("[%d] %d\n", bgId[qEnd-1], bgPids[qEnd-1]);
-                    fflush(stdout);
-                    signal(SIGCHLD, childHandler);
-                    background = false;
+                        printf("[%d] %d\n", bgId[qEnd-1], bgPids[qEnd-1]);
+                        fflush(stdout);
+                        signal(SIGCHLD, childHandler);
+                        background = false;
+                    } 
+                    else
+                    {
+                        chdir(v[1]);
+                        //perror("Error when changing directory");
+                    };
+
                 }
             }
         } /* switch */
