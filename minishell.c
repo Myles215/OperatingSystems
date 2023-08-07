@@ -136,7 +136,7 @@ int main(int argk, char *argv[], char *envp[])
             }
                 default: /* code executed only by parent process */
             {
-
+                wpid = 1;
                 if (!background)
                 {
                     wpid = wait(0);
