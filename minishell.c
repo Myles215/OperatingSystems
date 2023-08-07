@@ -133,7 +133,7 @@ int main(int argk, char *argv[], char *envp[])
                 {
                     if (execvp(v[0], v) == -1)
                     {
-                        perror("Exec in child failed");
+                        //perror("Exec in child failed");
                         exit(0);
                     }; 
                 } 
@@ -150,12 +150,12 @@ int main(int argk, char *argv[], char *envp[])
                     {
                         wait(0);
                         //printf("%s done \n", v[0]);
-                        break;
                     } 
                     else if (chdir(v[1]) != 0)
                     {
                         //perror("Error when changing directory");
                     };
+                    break;
                 }
                 else
                 {
