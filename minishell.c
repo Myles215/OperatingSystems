@@ -148,8 +148,9 @@ int main(int argk, char *argv[], char *envp[])
                         wait(0);
                         //printf("%s done \n", v[0]);
                     } 
-                    else if (chdir(v[1]) != 0)
+                    else
                     {
+                        int error = chdir(v[1]);
                         //perror("Error when changing directory");
                     };
                     break;
