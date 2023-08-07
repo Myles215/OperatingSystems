@@ -138,6 +138,7 @@ int main(int argk, char *argv[], char *envp[])
                 {
                     exit(0);
                 }
+                break;
             }
                 default: /* code executed only by parent process */
             {
