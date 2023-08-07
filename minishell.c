@@ -131,8 +131,16 @@ int main(int argk, char *argv[], char *envp[])
 
                 if (strcmp(v[0], "cd") != 0)
                 {
-                    execvp(v[0], v);
-                } else exit(0);
+                    if (execvp(v[0], v) == -1)
+                    {
+                        perror("Exec in child failed");
+                        exit(0);
+                    }; 
+                } 
+                else 
+                {
+                    exit(0);
+                }
             }
                 default: /* code executed only by parent process */
             {
@@ -143,7 +151,11 @@ int main(int argk, char *argv[], char *envp[])
                         wait(0);
                         //printf("%s done \n", v[0]);
                         break;
-                    } else chdir(v[1]);
+                    } 
+                    else if (chdir(v[1]) != 0)
+                    {
+                        perror("Error when changing directory");
+                    };
                 }
                 else
                 {
