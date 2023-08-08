@@ -148,6 +148,7 @@ int main(int argk, char *argv[], char *envp[])
                     else
                     {
                         chdir(v[1]);
+
                         //perror("Error when changing directory");
                     };
 
@@ -171,8 +172,12 @@ int main(int argk, char *argv[], char *envp[])
                     } 
                     else
                     {
+                        bgCount += 1;
+                        printf("[%d] %d\n", bgId[qEnd-1], bgPids[qEnd-1]);
                         chdir(v[1]);
-                        //perror("Error when changing directory");
+                        fprintf(stdout, "[%d]+ Done %s\n", bgCount, command);
+                        fflush(stdout);
+                        if (qStart == qEnd) bgCount = 0;
                     };
 
                 }
