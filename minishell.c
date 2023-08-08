@@ -173,7 +173,7 @@ int main(int argk, char *argv[], char *envp[])
                     else
                     {
                         bgCount += 1;
-                        printf("[%d] %d\n", bgId[qEnd-1], bgPids[qEnd-1]);
+                        printf("[%d] %d\n", bgCount, frkRtnVal);
                         chdir(v[1]);
                         fprintf(stdout, "[%d]+ Done %s\n", bgCount, command);
                         fflush(stdout);
