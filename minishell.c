@@ -60,6 +60,7 @@ void childHandler(int dummy)
             {
                 bgCount = 0;
             }
+            return;
         }
     }
     // If its not a background command we don't handle
