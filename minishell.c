@@ -49,8 +49,7 @@ void childHandler(int dummy)
         if (waitpid(bgPids[i], NULL, WNOHANG) != 0)
         {
             //Print the background command
-            fprintf(stdout, "[%d]+ Done %s\n", bgId[i], bgCmds[i]);
-            fflush(stdout);
+            printf("[%d]+ Done %s\n", bgId[i], bgCmds[i]);
             //Remove the old command and pid from our queue
             bgPids[i] = bgPids[qStart];
             strcpy(bgCmds[i], bgCmds[qStart]);
