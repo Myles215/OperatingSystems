@@ -41,15 +41,12 @@ int prompt(void)
 //Handles sigchld calls
 void childHandler(int dummy)
 {
-    //We check the pid of the calling process
-    int pid = waitpid((pid_t)-1, NULL, WNOHANG);
-
     //Check if this is one of our background processes
     for (int i = qStart;i!=qEnd;i++)
     {
         i = i%32;
         //If we find our background process handle it
-        if (bgPids[i] == pid)
+        if (waitpid(bgPids[i], NULL, WNOHANG) != 0)
         {
             //Print the background command
             fprintf(stdout, "[%d]+ Done %s\n", bgId[i], bgCmds[i]);
@@ -148,7 +145,6 @@ int main(int argk, char *argv[], char *envp[])
                     else
                     {
                         chdir(v[1]);
-
                         //perror("Error when changing directory");
                     };
 
@@ -172,12 +168,8 @@ int main(int argk, char *argv[], char *envp[])
                     } 
                     else
                     {
-                        bgCount += 1;
-                        printf("[%d] %d\n", bgCount, bgPids[qEnd-1]);
                         chdir(v[1]);
-                        fprintf(stdout, "[%d]+ Done %s\n", bgCount, command);
-                        fflush(stdout);
-                        if (qStart == qEnd) bgCount = 0;
+                        //perror("Error when changing directory");
                     };
 
                 }
