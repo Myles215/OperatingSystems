@@ -149,11 +149,15 @@ int main(int argk, char *argv[], char *envp[])
                     } 
                     else
                     {
-                        bgCount+=1;
+                        //Prepping background process stuff
+                        bgPids[qEnd] = frkRtnVal;
+                        strcpy(bgCmds[qEnd], command);
+                        bgCount += 1;
+                        bgId[qEnd] = bgCount;
+                        qEnd = (qEnd+1)%32;
                         printf("[%d] %d\n", bgCount, frkRtnVal);
                         fflush(stdout);
                         chdir(v[1]);
-                        if (qEnd == qStart) bgCount = 0;
                         //perror("Error when changing directory");
                     };
                     background = false;
