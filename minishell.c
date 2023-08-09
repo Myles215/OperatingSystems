@@ -39,30 +39,12 @@ int prompt(void)
 }
 
 //Handles sigchld calls
-void childHandler(int dummy)
-{
-    //Check if this is one of our background processes
-    for (int i = qStart;i!=qEnd;i++)
-    {
-        i = i%32;
-        //If we find our background process handle it
-        if (waitpid(bgPids[i], NULL, WNOHANG) != 0)
-        {
-            //Print the background command
-            fprintf(stdout, "[%d]+ Done %s\n", bgId[i], bgCmds[i]);
-            fflush(stdout);
-            //Remove the old command and pid from our queue
-            bgPids[i] = bgPids[qStart];
-            strcpy(bgCmds[i], bgCmds[qStart]);
-            bgId[i] = bgId[qStart];
-            qStart = (qStart + 1)%32;
-            if (qStart == qEnd) bgCount = 0;
-            return;
-        }
-    }
+// void childHandler(int dummy)
+// {
+
     //If its not a background command we don't handle
-    signal(SIGCHLD, childHandler);
-}
+//     signal(SIGCHLD, childHandler);
+// }
 
 int main(int argk, char *argv[], char *envp[])
     /* argk - number of arguments */
@@ -89,6 +71,28 @@ int main(int argk, char *argv[], char *envp[])
         if (line[0] == '#' || line[0] == '\n' || line[0] == '\000') continue; /* to prompt */
 
         v[0] = strtok(line, sep);
+
+        //Check if this is one of our background processes
+        for (int i = qStart;i!=qEnd;i++)
+        {
+            i = i%32;
+            //If we find our background process handle it
+            if (waitpid(bgPids[i], NULL, WNOHANG) != 0)
+            {
+                //Print the background command
+                fprintf(stdout, "[%d]+ Done %s\n", bgId[i], bgCmds[i]);
+                fflush(stdout);
+                //Remove the old command and pid from our queue
+                bgPids[i] = bgPids[qStart];
+                strcpy(bgCmds[i], bgCmds[qStart]);
+                bgId[i] = bgId[qStart];
+                qStart = (qStart + 1)%32;
+                if (qStart == qEnd) 
+                {
+                    bgCount = 0;
+                }
+            }
+        }
 
         char command[32];
         strcpy(command, v[0]);
@@ -163,7 +167,7 @@ int main(int argk, char *argv[], char *envp[])
 
                         printf("[%d] %d\n", bgId[qEnd-1], bgPids[qEnd-1]);
                         fflush(stdout);
-                        signal(SIGCHLD, childHandler);
+                        //signal(SIGCHLD, childHandler);
                     } 
                     else
                     {
