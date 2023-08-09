@@ -38,13 +38,33 @@ int prompt(void)
     return 0;
 }
 
-//Handles sigchld calls
-// void childHandler(int dummy)
-// {
-
-    //If its not a background command we don't handle
-//     signal(SIGCHLD, childHandler);
-// }
+// Handles sigchld calls
+void childHandler(int dummy)
+{
+    //Check if this is one of our background processes
+    for (int i = qStart;i!=qEnd;i++)
+    {
+        i = i%32;
+        //If we find our background process handle it
+        if (waitpid(bgPids[i], NULL, WNOHANG) != 0)
+        {
+            //Print the background command
+            fprintf(stdout, "[%d]+ Done %s\n", bgId[i], bgCmds[i]);
+            fflush(stdout);
+            //Remove the old command and pid from our queue
+            bgPids[i] = bgPids[qStart];
+            strcpy(bgCmds[i], bgCmds[qStart]);
+            bgId[i] = bgId[qStart];
+            qStart = (qStart + 1)%32;
+            if (qStart == qEnd) 
+            {
+                bgCount = 0;
+            }
+        }
+    }
+    // If its not a background command we don't handle
+    signal(SIGCHLD, childHandler);
+}
 
 int main(int argk, char *argv[], char *envp[])
     /* argk - number of arguments */
@@ -56,6 +76,8 @@ int main(int argk, char *argv[], char *envp[])
     char *v[NV]; /* array of pointers to command line tokens */
     char *sep = " \t\n";/* command line token separators */
     int i; /* parse index */
+
+    signal(SIGCHLD, childHandler);
 
     /* prompt for and process one command line at a time */
     while (1) { /* do Forever */
@@ -108,6 +130,7 @@ int main(int argk, char *argv[], char *envp[])
                 if (strcmp(v[0], "cd") != 0)
                 {
                     execvp(v[0], v);
+                    fflush(stdout);
                 } 
                 else 
                 {
@@ -155,6 +178,7 @@ int main(int argk, char *argv[], char *envp[])
                         bgCount += 1;
                         bgId[qEnd] = bgCount;
                         qEnd = (qEnd+1)%32;
+
                         printf("[%d] %d\n", bgCount, frkRtnVal);
                         fflush(stdout);
                         chdir(v[1]);
@@ -164,28 +188,6 @@ int main(int argk, char *argv[], char *envp[])
                 }
             }
         } /* switch */
-
-        //Check if this is one of our background processes
-        for (int i = qStart;i!=qEnd;i++)
-        {
-            i = i%32;
-            //If we find our background process handle it
-            if (waitpid(bgPids[i], NULL, WNOHANG) != 0)
-            {
-                //Print the background command
-                fprintf(stdout, "[%d]+ Done %s\n", bgId[i], bgCmds[i]);
-                fflush(stdout);
-                //Remove the old command and pid from our queue
-                bgPids[i] = bgPids[qStart];
-                strcpy(bgCmds[i], bgCmds[qStart]);
-                bgId[i] = bgId[qStart];
-                qStart = (qStart + 1)%32;
-                if (qStart == qEnd) 
-                {
-                    bgCount = 0;
-                }
-            }
-        }
 
     } /* while */
     return 0;
