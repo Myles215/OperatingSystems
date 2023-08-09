@@ -72,28 +72,6 @@ int main(int argk, char *argv[], char *envp[])
 
         v[0] = strtok(line, sep);
 
-        //Check if this is one of our background processes
-        for (int i = qStart;i!=qEnd;i++)
-        {
-            i = i%32;
-            //If we find our background process handle it
-            if (waitpid(bgPids[i], NULL, WNOHANG) != 0)
-            {
-                //Print the background command
-                fprintf(stdout, "[%d]+ Done %s\n", bgId[i], bgCmds[i]);
-                fflush(stdout);
-                //Remove the old command and pid from our queue
-                bgPids[i] = bgPids[qStart];
-                strcpy(bgCmds[i], bgCmds[qStart]);
-                bgId[i] = bgId[qStart];
-                qStart = (qStart + 1)%32;
-                if (qStart == qEnd) 
-                {
-                    bgCount = 0;
-                }
-            }
-        }
-
         char command[32];
         strcpy(command, v[0]);
 
@@ -182,6 +160,29 @@ int main(int argk, char *argv[], char *envp[])
                 }
             }
         } /* switch */
+
+        //Check if this is one of our background processes
+        for (int i = qStart;i!=qEnd;i++)
+        {
+            i = i%32;
+            //If we find our background process handle it
+            if (waitpid(bgPids[i], NULL, WNOHANG) != 0)
+            {
+                //Print the background command
+                fprintf(stdout, "[%d]+ Done %s\n", bgId[i], bgCmds[i]);
+                fflush(stdout);
+                //Remove the old command and pid from our queue
+                bgPids[i] = bgPids[qStart];
+                strcpy(bgCmds[i], bgCmds[qStart]);
+                bgId[i] = bgId[qStart];
+                qStart = (qStart + 1)%32;
+                if (qStart == qEnd) 
+                {
+                    bgCount = 0;
+                }
+            }
+        }
+
     } /* while */
     return 0;
 } /* main */
