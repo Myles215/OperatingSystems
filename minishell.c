@@ -57,6 +57,7 @@ void childHandler(int dummy)
             bgId[i] = bgId[qStart];
             qStart = (qStart + 1)%32;
             if (qStart == qEnd) bgCount = 0;
+            return;
         }
     }
     //If its not a background command we don't handle
