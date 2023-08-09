@@ -164,14 +164,17 @@ int main(int argk, char *argv[], char *envp[])
                         printf("[%d] %d\n", bgId[qEnd-1], bgPids[qEnd-1]);
                         fflush(stdout);
                         signal(SIGCHLD, childHandler);
-                        background = false;
                     } 
                     else
                     {
+                        bgCount+=1;
+                        printf("[%d] %d\n", bgCount, frkRtnVal);
+                        fflush(stdout);
                         chdir(v[1]);
+                        if (qEnd == qStart) bgCount = 0;
                         //perror("Error when changing directory");
                     };
-
+                    background = false;
                 }
             }
         } /* switch */
