@@ -57,11 +57,10 @@ void childHandler(int dummy)
             bgId[i] = bgId[qStart];
             qStart = (qStart + 1)%32;
             if (qStart == qEnd) bgCount = 0;
-            signal(SIGCHLD, childHandler);
-            return;
         }
     }
     //If its not a background command we don't handle
+    signal(SIGCHLD, childHandler);
 }
 
 int main(int argk, char *argv[], char *envp[])
