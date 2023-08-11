@@ -129,8 +129,12 @@ int main(int argk, char *argv[], char *envp[])
 
                 if (strcmp(v[0], "cd") != 0)
                 {
-                    execvp(v[0], v);
+                    int error = execvp(v[0], v);
                     fflush(stdout);
+                    if (error)
+                    {
+                        perror("Execvp failed in child process");
+                    }
                 } 
                 else 
                 {
@@ -149,7 +153,11 @@ int main(int argk, char *argv[], char *envp[])
                     } 
                     else
                     {
-                        chdir(v[1]);
+                        int error = chdir(v[1]);
+                        if (error == -1)
+                        {
+                            perror("Change directory failed error is: ");
+                        }
                         //perror("Error when changing directory");
                     };
 
