@@ -7,7 +7,7 @@ typedef struct {
     int modified;
 } page;
 
-enum repl { random, fifo, lru, clock};
+enum repl { rando, fifo, lru, clock};
 int createMMU(int);
 int checkInMemory(int );
 int allocateFrame(int );
@@ -109,7 +109,7 @@ page selectVictim(int page_number, enum repl mode)
         MMU[index] = newP;
 
     }
-    else if (mode == random)
+    else if (mode == rando)
     {
         int index = rand() % numFrames;
 
@@ -131,7 +131,7 @@ page selectVictim(int page_number, enum repl mode)
             }
         }
         victim = MMU[index];
-        timeAdded[index] = -1;
+        timeAdded[index] = time++;
         page newP;
         newP.pageNo = page_number;
         newP.modified = 0;
@@ -152,7 +152,7 @@ page selectVictim(int page_number, enum repl mode)
 
         if (index != -1){
             victim = MMU[index];
-            timeAdded[index] = -1;
+            timeAdded[index] = time++;
             page newP;
             newP.pageNo = page_number;
             newP.modified = 0;
@@ -201,7 +201,7 @@ int main(int argc, char *argv[])
             exit ( -1);
         }
         if (strcmp(argv[3], "lru\0") == 0) replace = lru;
-	    else if (strcmp(argv[3], "rand\0") == 0) replace = random;
+	    else if (strcmp(argv[3], "rand\0") == 0) replace = rando;
 	    else if (strcmp(argv[3], "clock\0") == 0) replace = clock;		 
 	    else if (strcmp(argv[3], "fifo\0") == 0) replace = fifo;		 
         else 
