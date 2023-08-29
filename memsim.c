@@ -15,9 +15,25 @@ page selectVictim(int, enum repl);
 const int pageoffset = 12;            /* Page size is fixed to 4 KB */
 int numFrames;
 
+// page table structure
 page* MMU;
 int* timeAdded;
+int* clockBit;
 int time = 0;
+
+//swap pages
+void swapPages(page * memory, int index1, int index2){
+    page temp = memory[index1];
+    memory[index1]=memory[index2];
+    memory[index2]=temp;
+}
+
+// swap index
+void swapIndex(int *array, int index1, int index2){
+    int temp = array[index1];
+    array[index1]=array[index2];
+    array[index2]=temp;
+}
 
 /* Creates the page table structure to record memory allocation */
 int createMMU (int frames)
@@ -25,10 +41,12 @@ int createMMU (int frames)
     // to do
     MMU = (page*) malloc(frames * sizeof(page));
     timeAdded = (int*) malloc(frames * sizeof(int));
+    clockBit = (int*) malloc(frames * sizeof(int));
 
     for (int i = 0;i<frames;i++)
     {
         timeAdded[i] = -1;
+        clockBit[i] = 0;
         MMU[i].pageNo = -1;
     }
     return 0;
@@ -45,6 +63,7 @@ int checkInMemory(int page_number)
         if (page_number == MMU[i].pageNo)
         {
             timeAdded[i] = time++;
+            clockBit[i]=1;
             return i;
         }
     }
@@ -111,6 +130,45 @@ page selectVictim(int page_number, enum repl mode)
         MMU[index].pageNo = page_number;
         MMU[index].modified = 1;
         victim = MMU[index];
+    }
+    else if (mode == fifo){
+        //find lowest time page,
+        // remove and set time = 0
+        int index = 0;
+        victim = MMU[index];
+        timeAdded[index] = -1;
+        page newP;
+        newP.pageNo = page_number;
+        newP.modified = 0;
+        MMU[index] = newP;
+
+        int tempIndex = 0;
+        while (tempIndex<numFrames-1){
+            swapPages(MMU,tempIndex, tempIndex+1);
+            swapIndex(timeAdded, tempIndex, tempIndex+1);
+            tempIndex+=1;
+        }
+    }
+    else if (mode == clock){
+        int index = -1;
+        for (int i = 0; i < numFrames; i++){
+            if(clockBit[i]==0){
+                index = i;
+                break;
+            }
+            else{
+                clockBit[i]=0;
+            }
+        }
+
+        if (index != -1){
+            victim = MMU[index];
+            timeAdded[index] = -1;
+            page newP;
+            newP.pageNo = page_number;
+            newP.modified = 0;
+            MMU[index] = newP;
+        }
     }
     // to do 
     return (victim);
