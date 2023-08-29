@@ -20,20 +20,7 @@ page* MMU;
 int* timeAdded;
 int* clockBit;
 int time = 0;
-
-//swap pages
-void swapPages(page * memory, int index1, int index2){
-    page temp = memory[index1];
-    memory[index1]=memory[index2];
-    memory[index2]=temp;
-}
-
-// swap index
-void swapIndex(int *array, int index1, int index2){
-    int temp = array[index1];
-    array[index1]=array[index2];
-    array[index2]=temp;
-}
+enum repl algo;
 
 /* Creates the page table structure to record memory allocation */
 int createMMU (int frames)
@@ -132,9 +119,17 @@ page selectVictim(int page_number, enum repl mode)
         victim = MMU[index];
     }
     else if (mode == fifo){
-        //find lowest time page,
-        // remove and set time = 0
-        int index = 0;
+        int max = -2;
+        int index;
+
+        for (int i = 0;i<numFrames;i++)
+        {
+            if (timeAdded[i] > max) 
+            {
+                max = timeAdded[i];
+                index = i;
+            }
+        }
         victim = MMU[index];
         timeAdded[index] = -1;
         page newP;
@@ -142,12 +137,6 @@ page selectVictim(int page_number, enum repl mode)
         newP.modified = 0;
         MMU[index] = newP;
 
-        int tempIndex = 0;
-        while (tempIndex<numFrames-1){
-            swapPages(MMU,tempIndex, tempIndex+1);
-            swapIndex(timeAdded, tempIndex, tempIndex+1);
-            tempIndex+=1;
-        }
     }
     else if (mode == clock){
         int index = -1;
@@ -220,7 +209,7 @@ int main(int argc, char *argv[])
             printf( "Replacement algorithm must be rand/fifo/lru/clock  \n");
             exit ( -1);
 	    }
-
+        algo = replace;
         if (strcmp(argv[4], "quiet\0") == 0) debugmode = 0;
 	    else if (strcmp(argv[4], "debug\0") == 0) debugmode = 1;
         else 
