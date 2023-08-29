@@ -48,8 +48,10 @@ int checkInMemory(int page_number)
     for (int i = 0;i<numFrames;i++)
     {
         if (page_number == MMU[i].pageNo)
-        {
-            timeAdded[i] = time++;
+        {   
+            if (algo!=fifo){
+                timeAdded[i] = time++;
+            }
             clockBit[i]=1;
             return i;
         }
@@ -119,14 +121,14 @@ page selectVictim(int page_number, enum repl mode)
         victim = MMU[index];
     }
     else if (mode == fifo){
-        int max = -2;
+        int min = 10000000;
         int index;
 
         for (int i = 0;i<numFrames;i++)
         {
-            if (timeAdded[i] > max) 
+            if (timeAdded[i] < min) 
             {
-                max = timeAdded[i];
+                min = timeAdded[i];
                 index = i;
             }
         }
