@@ -19,6 +19,7 @@ int numFrames;
 page* MMU;
 int* timeAdded;
 int* clockBit;
+int clockIndex = 0;
 int time = 0;
 enum repl algo;
 
@@ -75,6 +76,7 @@ int allocateFrame(int page_number)
             newPage.modified = 0;
             MMU[i] = newPage;
             timeAdded[i] = time++;
+            clockBit[i]=1;
             ret = i;
             break;
         }
@@ -142,16 +144,22 @@ page selectVictim(int page_number, enum repl mode)
     }
     else if (mode == clock){
         int index = -1;
-        for (int i = 0; i < numFrames; i++){
-            if(clockBit[i]==0){
-                index = i;
+        int tempIndex = clockIndex;
+        while (tempIndex < numFrames){
+            if(clockBit[tempIndex]==0){
+                index = tempIndex;
+                clockIndex = (index+1>=numFrames)? 0: index+1;
                 break;
             }
             else{
-                clockBit[i]=0;
+                clockBit[tempIndex]=0;
+            }
+            tempIndex+=1;
+            if (tempIndex >= numFrames){
+                tempIndex=0;
             }
         }
-
+       
         if (index != -1){
             victim = MMU[index];
             timeAdded[index] = time++;
@@ -159,6 +167,7 @@ page selectVictim(int page_number, enum repl mode)
             newP.pageNo = page_number;
             newP.modified = 0;
             MMU[index] = newP;
+            clockBit[index]=1;
         }
     }
     // to do 
