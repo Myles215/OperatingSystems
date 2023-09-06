@@ -102,7 +102,7 @@ page selectVictim(int page_number, enum repl mode)
         int index = -1;
         // by updating the frame on last access, finding the minimum of timeAdded
         // will give us the least recently use for swap
-        for (int i = 0;i<numdp[dp.size() - i][j];Frames;i++)
+        for (int i = 0;i<numFrames;i++)
         {
             if (timeAdded[i] < mini) 
             {
