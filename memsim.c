@@ -15,11 +15,11 @@ page selectVictim(int, enum repl);
 const int pageoffset = 12;            /* Page size is fixed to 4 KB */
 int numFrames;
 
-// page table structure
-page* MMU;
-int* timeAdded;
-int* clockBit;
-int clockIndex = 0;
+
+page* MMU; // page table structure
+int* timeAdded; // stores when the frame was added
+int* clockBit; // store the bits for the clock algo
+int clockIndex = 0; // index to keep track of where we are along the clockbit array
 int time = 0;
 enum repl algo;
 
@@ -50,6 +50,8 @@ int checkInMemory(int page_number)
     {
         if (page_number == MMU[i].pageNo)
         {   
+            // by updating the frame on use to a new time, we can increase its priority
+            // and not get it kicked out when we swap
             if (algo!=fifo){
                 timeAdded[i] = time++;
             }
@@ -95,7 +97,8 @@ page selectVictim(int page_number, enum repl mode)
 
         int mini = 1000000000;
         int index = -1;
-
+        // by updating the frame on last access, finding the minimum of timeAdded
+        // will give us the least recently use for swap
         for (int i = 0;i<numFrames;i++)
         {
             if (timeAdded[i] < mini) 
@@ -125,7 +128,7 @@ page selectVictim(int page_number, enum repl mode)
     else if (mode == fifo){
         int min = 10000000;
         int index;
-
+        // find the frame which came in first by finding min of timeAdded and swap
         for (int i = 0;i<numFrames;i++)
         {
             if (timeAdded[i] < min) 
@@ -143,6 +146,11 @@ page selectVictim(int page_number, enum repl mode)
 
     }
     else if (mode == clock){
+        /*
+        move around the clock array like a circle until we find one which has value 0
+        while we move around, if current value is 1, make it 0
+        keep index as we circle through
+        */
         int index = -1;
         int tempIndex = clockIndex;
         while (tempIndex < numFrames){
