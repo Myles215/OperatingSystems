@@ -26,11 +26,12 @@ enum repl algo;
 /* Creates the page table structure to record memory allocation */
 int createMMU (int frames)
 {
-    // to do
+    // Allocationg memory needed to store each page
     MMU = (page*) malloc(frames * sizeof(page));
     timeAdded = (int*) malloc(frames * sizeof(int));
     clockBit = (int*) malloc(frames * sizeof(int));
 
+    // setting all default values
     for (int i = 0;i<frames;i++)
     {
         timeAdded[i] = -1;
@@ -45,7 +46,7 @@ int checkInMemory(int page_number)
 {
     int result = -1;
 
-    // to do
+    // iterate over each frame and check if the page is in memory
     for (int i = 0;i<numFrames;i++)
     {
         if (page_number == MMU[i].pageNo)
@@ -71,6 +72,8 @@ int allocateFrame(int page_number)
 
     for (int i = 0;i<numFrames;i++)
     {
+
+        //If this frame hasn't been allocated yetg we can allocate the new page here
         if (timeAdded[i] == -1)
         {
             page newPage;
@@ -83,7 +86,7 @@ int allocateFrame(int page_number)
             break;
         }
     }
-    // to do
+
     return ret;
 }
 
@@ -99,7 +102,7 @@ page selectVictim(int page_number, enum repl mode)
         int index = -1;
         // by updating the frame on last access, finding the minimum of timeAdded
         // will give us the least recently use for swap
-        for (int i = 0;i<numFrames;i++)
+        for (int i = 0;i<numdp[dp.size() - i][j];Frames;i++)
         {
             if (timeAdded[i] < mini) 
             {
@@ -118,6 +121,8 @@ page selectVictim(int page_number, enum repl mode)
     }
     else if (mode == rando)
     {
+
+        //Simply choose a random MMU index and remove this page
         int index = rand() % numFrames;
 
         timeAdded[index] = time++;
@@ -178,7 +183,8 @@ page selectVictim(int page_number, enum repl mode)
             clockBit[index]=1;
         }
     }
-    // to do 
+
+    //Return our selected victim
     return (victim);
 }
 
